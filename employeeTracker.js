@@ -52,20 +52,56 @@ function runTracker() {
 
 function addDRE() {
   inquirer
-    .prompt({
-      name: "artist",
-      type: "input",
-      message: "What artist would you like to search for?"
-    })
-    .then(function(answer) {
-      var query = "SELECT position, song, year FROM top5000 WHERE ?";
-      connection.query(query, { artist: answer.artist }, function(err, res) {
-        for (var i = 0; i < res.length; i++) {
-          console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
+    .prompt([
+      {
+        name: "firstName",
+        type: "input",
+        message: "What is the employee's first name?"
+      },
+      {
+        name: "lastName",
+        type: "input",
+        message: "What is the employee's last name?"
+      },
+      {
+        name: "department",
+        type: "input",
+        message: "What is the employee's department?"
+      }
+      {
+        name: "startingBid",
+        type: "input",
+        message: "What would you like your starting bid to be?",
+        validate: function(value) {
+          if (isNaN(value) === false) {
+            return true;
+          }
+          return false;
         }
-        runTracker();
-      });
+      }
+
+
+
+    ])
+    .then(function(answer) {
+      // when finished prompting, insert a new item into the db with that info
+      connection.query(
+        "INSERT INTO auctions SET ?",
+        {
+          item_name: answer.item,
+          category: answer.category,
+          starting_bid: answer.startingBid || 0,
+          highest_bid: answer.startingBid || 0
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Your auction was created successfully!");
+          // re-prompt the user for if they want to bid or post
+          start();
+        }
+      );
     });
+}
 }
 
 function viewDRE() {
