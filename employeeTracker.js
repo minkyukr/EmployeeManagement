@@ -49,44 +49,114 @@ function runTracker() {
     });
 }
 // until here, the user can choose what it would like to do.
-
+//under this section, I will ask if I want to add a department or roles or employees
 function addDRE() {
+  inquirer
+    .prompt({ 
+      name: "addAction",
+      type: "rawlist",
+      message: "What would you like to do?",
+      choices: [
+        "Add departments?", 
+        "Add roles?",
+        "Add employee?"
+    ]
+    })
+    .then(function(answer) {
+      switch (answer.addAction) {
+      case "Add departments?":
+        addDepartment();
+        break;
+
+      case "Add roles?":
+        addRoles();
+        break;
+
+      case "Add employee?":
+        addEmployee();
+        break;
+      }
+    });
+}
+
+function addDepartment() {
+  // prompt for info about the item being put up for auction
   inquirer
     .prompt([
       {
-        name: "firstName",
+        name: "departmentName",
         type: "input",
-        message: "What is the employee's first name?"
-      },
-      {
-        name: "lastName",
-        type: "input",
-        message: "What is the employee's last name?"
-      },
-      {
-        name: "department",
-        type: "input",
-        message: "What is the employee's department?"
+        message: "What's the new department?"
       }
-      {
-        name: "startingBid",
-        type: "input",
-        message: "What would you like your starting bid to be?",
-        validate: function(value) {
-          if (isNaN(value) === false) {
-            return true;
-          }
-          return false;
-        }
-      }
-
-
-
     ])
     .then(function(answer) {
       // when finished prompting, insert a new item into the db with that info
       connection.query(
-        "INSERT INTO auctions SET ?",
+        "INSERT INTO department SET ?",
+        {
+          department_name: answer.departmentName
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Your department was created successfully!");
+          // re-prompt the user for if they want to bid or post
+          runTracker();
+        }
+      );
+    });
+}
+
+function addRoles() {
+  // prompt for info about the item being put up for auction
+  inquirer
+    .prompt([
+      {
+        name: "title",
+        type: "input",
+        message: "What's the new title?"
+      },
+      {
+        name: "salary",
+        type: "input",
+        message: "Salary?"
+      },
+      {
+        name: "departmentID",
+        type: "input",
+        message: "What's the department id"
+      }
+    ])
+    .then(function(answer) {
+      // when finished prompting, insert a new item into the db with that info
+      connection.query(
+        "INSERT INTO roles SET ?",
+        {
+          title: answer.title,
+          salary: answer.salary,
+          department_id: answer.departmentID
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Your department was created successfully!");
+          // re-prompt the user for if they want to bid or post
+          runTracker();
+        }
+      );
+    });
+}
+//여기까지 끝=================================
+
+
+
+
+
+
+
+
+    .then(function(answer) {
+      // when finished prompting, insert a new item into the db with that info
+      connection.query(
+        "INSERT INTO department SET ?",
         {
           item_name: answer.item,
           category: answer.category,
@@ -102,7 +172,60 @@ function addDRE() {
       );
     });
 }
-}
+
+// function addDRE() {
+//   inquirer
+//     .prompt([
+//       {
+//         name: "firstName",
+//         type: "input",
+//         message: "What is the employee's first name?"
+//       },
+//       {
+//         name: "lastName",
+//         type: "input",
+//         message: "What is the employee's last name?"
+//       },
+//       {
+//         name: "department",
+//         type: "input",
+//         message: "What is the employee's department?"
+//       }
+//       {
+//         name: "startingBid",
+//         type: "input",
+//         message: "What would you like your starting bid to be?",
+//         validate: function(value) {
+//           if (isNaN(value) === false) {
+//             return true;
+//           }
+//           return false;
+//         }
+//       }
+
+
+
+//     ])
+//     .then(function(answer) {
+//       // when finished prompting, insert a new item into the db with that info
+//       connection.query(
+//         "INSERT INTO department SET ?",
+//         {
+//           item_name: answer.item,
+//           category: answer.category,
+//           starting_bid: answer.startingBid || 0,
+//           highest_bid: answer.startingBid || 0
+//         },
+//         function(err) {
+//           if (err) throw err;
+//           console.log("Your auction was created successfully!");
+//           // re-prompt the user for if they want to bid or post
+//           start();
+//         }
+//       );
+//     });
+// }
+
 
 function viewDRE() {
   var query = "SELECT artist FROM top5000 GROUP BY artist HAVING count(*) > 1";
