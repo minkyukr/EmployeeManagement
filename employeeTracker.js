@@ -94,7 +94,7 @@ function addDepartment() {
       connection.query(
         "INSERT INTO department SET ?",
         {
-          department_name: answer.departmentName
+          name: answer.departmentName
         },
         function(err) {
           if (err) throw err;
